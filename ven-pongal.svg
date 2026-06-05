@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect fill="#f0d9a0" width="400" height="300"/>
+  <ellipse cx="200" cy="160" rx="90" ry="55" fill="#e8c468" stroke="#a67c2e" stroke-width="3"/>
+  <text x="200" y="168" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="22" fill="#4a3520">Ven Pongal</text>
+</svg>

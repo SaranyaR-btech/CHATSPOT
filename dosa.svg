@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect fill="#f5e0c0" width="400" height="300"/>
+  <ellipse cx="200" cy="150" rx="110" ry="45" fill="#f8e8c8" stroke="#c4a574" stroke-width="3"/>
+  <text x="200" y="158" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="28" fill="#5c4033">Dosa</text>
+</svg>
