@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300">
+  <rect fill="#d4c4a8" width="400" height="300"/>
+  <rect x="140" y="100" width="100" height="80" rx="8" fill="#8b6914"/>
+  <rect x="155" y="85" width="70" height="25" rx="4" fill="#6b4423"/>
+  <text x="200" y="230" text-anchor="middle" font-family="Segoe UI,sans-serif" font-size="28" fill="#3d2914">Tea</text>
+</svg>
