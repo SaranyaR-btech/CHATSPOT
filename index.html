@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Restaurant POS</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <!-- Data is stored in browser localStorage. Clearing browser data will reset menu and sales. -->
+  <header class="header">
+    <h1 class="shop-name" id="shopNameDisplay">Chatspot Restaurant</h1>
+    <nav class="nav" aria-label="Main navigation">
+      <button type="button" class="nav-btn active" data-view="billing">Billing</button>
+      <button type="button" class="nav-btn" data-view="menu-admin">Manage Menu</button>
+      <button type="button" class="nav-btn" data-view="reports">Reports</button>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Billing -->
+    <section id="view-billing" class="view view-active">
+      <div class="billing-layout">
+        <div class="menu-section">
+          <h2 class="section-title">Menu</h2>
+          <div id="menuGrid" class="menu-grid" role="list"></div>
+          <p id="menuEmpty" class="empty-state hidden">No menu items. Add items in Manage Menu.</p>
+        </div>
+        <aside class="cart-panel" aria-label="Shopping cart">
+          <h2 class="section-title">Cart</h2>
+          <ul id="cartList" class="cart-list"></ul>
+          <p id="cartEmpty" class="empty-state">Click menu items to add them here.</p>
+          <div class="cart-footer">
+            <div class="cart-total">
+              <span>Total</span>
+              <strong id="cartTotal">₹0.00</strong>
+            </div>
+            <div class="cart-actions">
+              <button type="button" id="btnClearCart" class="btn btn-secondary">Clear Cart</button>
+              <button type="button" id="btnPrintBill" class="btn btn-secondary">Print Bill</button>
+              <button type="button" id="btnPayNow" class="btn btn-primary">Pay Now</button>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- Manage Menu -->
+    <section id="view-menu-admin" class="view hidden">
+      <div class="admin-layout">
+        <div class="settings-card card">
+          <h2 class="section-title">Shop Settings</h2>
+          <form id="settingsForm" class="form">
+            <label>
+              Shop name
+              <input type="text" id="inputShopName" required placeholder="Your restaurant name">
+            </label>
+            <label>
+              UPI ID
+              <input type="text" id="inputUpiId" placeholder="yourname@upi" pattern=".+@.+">
+              <span class="hint">Format: name@bank (used for Pay Now QR)</span>
+            </label>
+            <button type="submit" class="btn btn-primary">Save Settings</button>
+          </form>
+        </div>
+
+        <div class="menu-form-card card">
+          <h2 class="section-title" id="menuFormTitle">Add Menu Item</h2>
+          <form id="menuForm" class="form">
+            <input type="hidden" id="menuEditId">
+            <label>
+              Name
+              <input type="text" id="menuName" required placeholder="e.g. Idly">
+            </label>
+            <label>
+              Price (₹)
+              <input type="number" id="menuPrice" required min="0.01" step="0.01" placeholder="30">
+            </label>
+            <label>
+              Image URL
+              <input type="url" id="menuImageUrl" placeholder="https://... or images/item.svg">
+            </label>
+            <label>
+              Or upload image
+              <input type="file" id="menuImageFile" accept="image/*">
+            </label>
+            <p id="menuFormErrors" class="form-errors hidden" role="alert"></p>
+            <div class="form-actions">
+              <button type="submit" class="btn btn-primary" id="menuSubmitBtn">Add Item</button>
+              <button type="button" id="menuCancelEdit" class="btn btn-secondary hidden">Cancel Edit</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="menu-table-card card">
+          <h2 class="section-title">Menu Items</h2>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Price</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="menuTableBody"></tbody>
+            </table>
+          </div>
+          <p id="adminMenuEmpty" class="empty-state hidden">No items yet.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Reports -->
+    <section id="view-reports" class="view hidden">
+      <div class="reports-layout">
+        <div class="reports-controls card">
+          <label>
+            Month
+            <input type="month" id="reportMonth" class="month-input">
+          </label>
+        </div>
+        <div class="metrics-grid">
+          <div class="metric-card card">
+            <span class="metric-label">Total Revenue</span>
+            <strong id="metricRevenue" class="metric-value">₹0.00</strong>
+          </div>
+          <div class="metric-card card">
+            <span class="metric-label">Orders</span>
+            <strong id="metricOrders" class="metric-value">0</strong>
+          </div>
+          <div class="metric-card card">
+            <span class="metric-label">Average Bill</span>
+            <strong id="metricAverage" class="metric-value">₹0.00</strong>
+          </div>
+        </div>
+        <div class="card">
+          <h2 class="section-title">Top Items</h2>
+          <ul id="topItemsList" class="top-items-list"></ul>
+          <p id="topItemsEmpty" class="empty-state">No sales for this month.</p>
+        </div>
+        <div class="card">
+          <h2 class="section-title">Sales History</h2>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Items</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="salesTableBody"></tbody>
+            </table>
+          </div>
+          <p id="salesEmpty" class="empty-state hidden">No sales for this month.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Pay Now modal -->
+  <div id="payModal" class="modal hidden" role="dialog" aria-labelledby="payModalTitle" aria-modal="true">
+    <div class="modal-backdrop" data-close-modal></div>
+    <div class="modal-content card">
+      <h2 id="payModalTitle" class="section-title">Pay Now</h2>
+      <p class="pay-amount">Amount: <strong id="payAmount">₹0.00</strong></p>
+      <p id="payUpiWarning" class="form-errors hidden">Set your UPI ID in Manage Menu → Shop Settings.</p>
+      <div id="qrContainer" class="qr-container"></div>
+      <p class="hint">Scan with any UPI app. Tap Confirm after payment is received.</p>
+      <div class="modal-actions">
+        <button type="button" id="btnConfirmPayment" class="btn btn-primary">Confirm Payment</button>
+        <button type="button" class="btn btn-secondary" data-close-modal>Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit menu modal -->
+  <div id="editModal" class="modal hidden" role="dialog" aria-labelledby="editModalTitle" aria-modal="true">
+    <div class="modal-backdrop" data-close-edit></div>
+    <div class="modal-content card">
+      <h2 id="editModalTitle" class="section-title">Edit Item</h2>
+      <form id="editForm" class="form">
+        <input type="hidden" id="editId">
+        <label>
+          Name
+          <input type="text" id="editName" required>
+        </label>
+        <label>
+          Price (₹)
+          <input type="number" id="editPrice" required min="0.01" step="0.01">
+        </label>
+        <label>
+          Image URL
+          <input type="text" id="editImageUrl" required>
+        </label>
+        <label>
+          Or upload image
+          <input type="file" id="editImageFile" accept="image/*">
+        </label>
+        <p id="editFormErrors" class="form-errors hidden" role="alert"></p>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-secondary" data-close-edit>Cancel</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Print receipt (hidden on screen, visible when printing) -->
+  <div id="printReceipt" class="print-receipt" aria-hidden="true"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/menu.js"></script>
+  <script src="js/reports.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
